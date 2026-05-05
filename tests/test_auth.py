@@ -113,6 +113,9 @@ class TestTabloAuthDiscover:
         assert d.name == "Living Room Tablo"
         assert d.local_url == "http://10.0.0.5:8885"
         assert d.lighthouse_token == "lh_token_xyz"
+        assert d.account_token == "tok123"
+        assert d.client_id is not None
+        assert len(d.client_id) > 0
 
     def test_login_failure_raises(self):
         auth = self._make_auth()
