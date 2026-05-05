@@ -1,0 +1,17 @@
+{
+  "people": [
+    "Trevor Viljoen"
+  ],
+  "projects": [
+    "tablo-api",
+    "TabloAuth",
+    "TabloDevice",
+    "Optional",
+    "BaseModel",
+    "TabloClient",
+    "Python",
+    "MagicMock",
+    "Pydantic"
+  ],
+  "topics": []
+}

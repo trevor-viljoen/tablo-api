@@ -1,0 +1,20 @@
+wing: tablo_api
+rooms:
+- name: tablo_api
+  description: Files from tablo_api/
+  keywords:
+  - tablo_api
+  - tablo_api
+- name: testing
+  description: Files from tests/
+  keywords:
+  - testing
+  - tests
+- name: examples
+  description: Files from examples/
+  keywords:
+  - examples
+  - examples
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

@@ -1,5 +1,6 @@
 """Tests for TabloClient — channel listing and stream start (mocked)."""
 
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -14,6 +15,8 @@ DEVICE = TabloDevice(
     name="Living Room Tablo",
     local_url="http://10.0.0.5:8885",
     lighthouse_token="lh_token_xyz",
+    account_token="acc_token_123",
+    client_id="client_uuid_456",
 )
 
 CHANNEL_LIST = [
@@ -33,7 +36,7 @@ CHANNEL_LIST = [
         "identifier": "OTT_001",
         "name": "Peacock",
         "kind": "ott",
-        "ott": {"major": 100, "minor": 1, "callSign": "PEACOCK", "network": "Peacock"},
+        "ott": {"major": 0, "minor": 0, "callSign": "PEACOCK", "network": "Peacock"},
     },
 ]
 
@@ -66,7 +69,8 @@ class TestTabloClientChannels:
         with patch.object(client._session, "get", return_value=_resp(CHANNEL_LIST)):
             channels = client.channels()
 
-        assert len(channels) == 2  # OTT excluded by default
+        # OTA 4.1, OTA 5.1 (OTT filtered out by default)
+        assert len(channels) == 2
         assert channels[0].major == 4
         assert channels[0].call_sign == "KFOR"
         assert channels[1].major == 5
@@ -75,7 +79,13 @@ class TestTabloClientChannels:
         client = self._client()
         with patch.object(client._session, "get", return_value=_resp(CHANNEL_LIST)):
             channels = client.channels(include_ott=True)
+        # 2 OTA + 1 OTT
         assert len(channels) == 3
+        # Sorting: OTA first, then OTT
+        assert channels[0].major == 4
+        assert channels[1].major == 5
+        assert channels[2].major == 0
+        assert channels[2].display_name == "PEACOCK"
 
     def test_channel_display_name(self):
         client = self._client()
@@ -88,7 +98,10 @@ class TestTabloClientChannels:
         with patch.object(client._session, "get", return_value=_resp([])) as mock_get:
             client.channels()
         url = mock_get.call_args[0][0]
+        headers = mock_get.call_args[1]["headers"]
         assert "lh_token_xyz" in url
+        assert headers["Authorization"] == "Bearer acc_token_123"
+        assert headers["Lighthouse"] == "lh_token_xyz"
 
     def test_empty_lineup(self):
         client = self._client()
@@ -142,6 +155,15 @@ class TestTabloClientWatch:
             client.watch("S122912_503_01")
         headers = mock_post.call_args[1]["headers"]
         assert headers["Authorization"].startswith("tablo:")
+
+    def test_watch_sends_correct_body(self):
+        client = self._client()
+        with patch.object(client._session, "post", return_value=_resp(WATCH_RESP)) as mock_post:
+            client.watch("S122912_503_01")
+        
+        body = json.loads(mock_post.call_args[1]["data"])
+        assert body["device_id"] == "client_uuid_456"
+        assert body["platform"] == "ios"
 
 
 class TestTabloClientPing:

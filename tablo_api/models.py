@@ -19,6 +19,12 @@ class TabloDevice(BaseModel):
     lighthouse_token: str
     """Per-session token used for cloud guide requests and local auth."""
 
+    account_token: str
+    """The original Bearer access token from the login response, required for cloud API."""
+
+    client_id: str
+    """Stable UUID for this client/device session, used to track streams."""
+
 
 class TabloChannel(BaseModel):
     """An OTA or OTT channel available on a Tablo device."""
@@ -27,18 +33,29 @@ class TabloChannel(BaseModel):
     """Cloud identifier, e.g. ``S122912_503_01``."""
 
     call_sign: str
-    major: int
-    minor: int
+    major: int = 0
+    minor: int = 0
     network: str = ""
     kind: str = "ota"  # "ota" | "ott"
 
     @computed_field
     @property
     def display_name(self) -> str:
-        return f"{self.major}.{self.minor} {self.call_sign}"
+        if self.major > 0:
+            return f"{self.major}.{self.minor} {self.call_sign}"
+        return self.call_sign
 
     def __lt__(self, other: "TabloChannel") -> bool:
-        return (self.major, self.minor) < (other.major, other.minor)
+        # Sort OTA (major > 0) before OTT (major == 0)
+        if (self.major > 0) != (other.major > 0):
+            return self.major > 0
+        
+        # Both OTA: sort by number
+        if self.major > 0:
+            return (self.major, self.minor) < (other.major, other.minor)
+        
+        # Both OTT: sort by call sign
+        return self.call_sign < other.call_sign
 
 
 class TabloStream(BaseModel):

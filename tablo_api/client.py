@@ -50,7 +50,7 @@ class TabloClient:
         resp = self._session.get(
             f"{_CLOUD_HOST}{path}",
             headers={
-                "Authorization": f"Bearer {self.device.lighthouse_token}",
+                "Authorization": f"Bearer {self.device.account_token}",
                 "Lighthouse": self.device.lighthouse_token,
                 "Accept": "*/*",
                 "User-Agent": _CLOUD_USER_AGENT,
@@ -69,8 +69,6 @@ class TabloClient:
             call_sign = (info and info.callSign) or ch.name or ch.identifier
             major = (info and info.major) or 0
             minor = (info and info.minor) or 0
-            if major == 0:
-                continue
             out.append(
                 TabloChannel(
                     identifier=ch.identifier,
@@ -106,7 +104,8 @@ class TabloClient:
                     "deviceMake": "Apple",
                     "deviceOS": "iOS",
                 },
-                "device_id": str(uuid.uuid4()),
+                "device_id": self.device.client_id,
+                "platform": "ios",
             }
         )
 

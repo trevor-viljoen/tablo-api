@@ -2,6 +2,7 @@
 
 import hashlib
 import hmac
+import uuid
 from datetime import datetime, timezone
 from email.utils import format_datetime
 
@@ -55,6 +56,7 @@ class TabloAuth:
             raise TabloAuthError("No devices found on this Tablo account.")
 
         pid = account.profiles[0].identifier
+        client_id = str(uuid.uuid4())
         devices: list[TabloDevice] = []
 
         for dev in account.devices:
@@ -65,6 +67,8 @@ class TabloAuth:
                     name=dev.name,
                     local_url=dev.url,
                     lighthouse_token=token,
+                    account_token=login.access_token,
+                    client_id=client_id,
                 )
             )
 
