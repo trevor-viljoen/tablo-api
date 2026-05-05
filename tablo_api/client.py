@@ -1,7 +1,6 @@
 """Tablo 4th Gen API client — channel listing and live streaming."""
 
 import json
-import uuid
 
 import requests
 
