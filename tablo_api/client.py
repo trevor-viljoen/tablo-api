@@ -113,6 +113,7 @@ class TabloClient:
         resp = self._session.post(
             self.device.local_url.rstrip("/") + path,
             data=body.encode(),
+            params="lh",
             headers={
                 "Authorization": auth_header,
                 "Date": date_header,
