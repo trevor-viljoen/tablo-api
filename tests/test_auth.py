@@ -2,7 +2,6 @@
 
 import hashlib
 import hmac
-import re
 from email.utils import parsedate_to_datetime
 from unittest.mock import MagicMock, patch
 
