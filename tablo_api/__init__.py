@@ -5,4 +5,4 @@ from .auth import TabloAuth
 from .models import TabloDevice, TabloChannel, TabloStream
 
 __all__ = ["TabloClient", "TabloAuth", "TabloDevice", "TabloChannel", "TabloStream"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
